@@ -1,0 +1,25 @@
+video-player-container {
+  position: relative;
+  display: block;
+  width: 100%;
+  height: 100vh;
+}
+
+video-player-container #main-video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: cadetblue;
+}
+
+video-player-container #secondary-video {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  width: 200px;
+  height: 150px;
+  border: 2px solid #fff;
+  background-color: rgba(0, 0, 0, 0.5);
+}
