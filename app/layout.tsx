@@ -9,11 +9,11 @@ export const viewport: Viewport = {
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Zoom VideoSDK",
-  description: "Zoom x Next.js",
-  icons: {
-    icon: "/favicon.svg",
-  },
+  title: "video-chat",
+  description: "vide0 chat",
+  // icons: {
+  //   icon: "/favicon.svg",
+  // },
 };
 
 export default function RootLayout({

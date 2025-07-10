@@ -7,6 +7,18 @@ import ZoomVideo, {
 import { FunctionComponent, useEffect, useRef } from "react";
 import "./Canvas.css"; // Assuming you have some styles for the video player
 
+// Allow usage of <video-player-container> as a custom element in JSX
+declare global {
+  namespace JSX {
+    interface IntrinsicElements {
+      "video-player-container": React.DetailedHTMLProps<
+        React.HTMLAttributes<HTMLElement>,
+        HTMLElement
+      >;
+    }
+  }
+}
+
 declare global {
   interface Window {
     videoController?: Record<string, unknown>;
@@ -29,7 +41,7 @@ const Canvas: FunctionComponent = () => {
     ZoomVideo.createClient()
   );
 
-  const peerVideoStateChange = async (event: {
+  const renderVideo = async (event: {
     action: "Start" | "Stop";
     userId: number;
   }) => {
@@ -74,14 +86,32 @@ const Canvas: FunctionComponent = () => {
     const jwt = await getToken(sessionName);
     const userName = `User-${new Date().getTime().toString().slice(8)}`;
     await zoomClient.current.join(sessionName, jwt, userName);
+
+    await myStream.current?.startVideo();
+    await myStream.current?.startAudio();
+    await renderVideo({
+      action: "Start",
+      userId: zoomClient.current.getCurrentUserInfo().userId,
+    });
+  };
+
+  const leaveSession = async () => {
+    if (!zoomClient.current) return;
+    myStream.current?.stopVideo();
+    renderVideo({
+      action: "Stop",
+      userId: zoomClient.current.getCurrentUserInfo().userId,
+    });
+    zoomClient.current.off("peer-video-state-change", renderVideo);
+    await zoomClient.current.leave();
   };
 
   useEffect(() => {
     if (zoomClient.current) {
       zoomClient.current.init("en-US", "Global", { patchJsMedia: true });
       myStream.current = zoomClient.current.getMediaStream();
-      zoomClient.current.on("peer-video-state-change", peerVideoStateChange);
-      window.videoController = { joinSession }; // Expose joinSession globally for testing
+      zoomClient.current.on("peer-video-state-change", renderVideo);
+      window.videoController = { joinSession, leaveSession }; // Expose joinSession globally for testing
     }
   }, []);
 
