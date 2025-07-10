@@ -1,11 +1,12 @@
-video-player-container {
+.canvas-container {
   position: relative;
   display: block;
   width: 100%;
   height: 100vh;
+  overflow: "hidden";
 }
 
-video-player-container #main-video {
+.canvas-container #main-video {
   position: absolute;
   top: 0;
   left: 0;
@@ -14,7 +15,7 @@ video-player-container #main-video {
   background-color: cadetblue;
 }
 
-video-player-container #secondary-video {
+.canvas-container #secondary-video {
   position: absolute;
   bottom: 10px;
   right: 10px;
@@ -23,3 +24,19 @@ video-player-container #secondary-video {
   border: 2px solid #fff;
   background-color: rgba(0, 0, 0, 0.5);
 }
+
+video-player {
+  width: 100%;
+  height: auto;
+  aspect-ratio: 16/9;
+}
+
+/* .video-button {
+  color: white;
+  background-color: transparent;
+  border: none;
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  font-size: 16px;
+} */

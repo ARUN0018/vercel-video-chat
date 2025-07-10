@@ -35,8 +35,8 @@ const getToken = async (sessionName: string) => {
 };
 
 const Canvas: FunctionComponent = () => {
-  const ref = useRef<HTMLVideoElement>(null);
-  const myStream = useRef<typeof Stream | null>(null);
+  const mainVideoRef = useRef<HTMLVideoElement>(null);
+  const secondaryVideoRef = useRef<HTMLVideoElement>(null);
   const zoomClient = useRef<ReturnType<typeof ZoomVideo.createClient>>(
     ZoomVideo.createClient()
   );
@@ -45,12 +45,13 @@ const Canvas: FunctionComponent = () => {
     action: "Start" | "Stop";
     userId: number;
   }) => {
+    const stream = zoomClient.current.getMediaStream();
     if (event.action === "Start") {
-      const userVideo = await myStream.current?.attachVideo(
+      const userVideo = await stream.attachVideo(
         event.userId,
         VideoQuality.Video_360P
       );
-      if (userVideo && ref.current) {
+      if (userVideo && mainVideoRef.current && secondaryVideoRef.current) {
         if ((userVideo as ExecutedFailure).errorCode) {
           console.error(
             `Failed to attach video for user ${event.userId}: ${
@@ -61,18 +62,14 @@ const Canvas: FunctionComponent = () => {
         }
 
         if (event.userId === zoomClient.current?.getCurrentUserInfo().userId) {
-          ref.current
-            .querySelector("#secondary-video")
-            ?.appendChild(userVideo as VideoPlayer);
+          secondaryVideoRef.current.appendChild(userVideo as VideoPlayer);
         } else {
-          ref.current
-            .querySelector("#main-video")
-            ?.appendChild(userVideo as VideoPlayer);
+          mainVideoRef.current.appendChild(userVideo as VideoPlayer);
         }
       }
     } else if (event.action === "Stop") {
-      const element = await myStream.current?.detachVideo(event.userId);
-      if (element && ref.current) {
+      const element = await stream.detachVideo(event.userId);
+      if (element && mainVideoRef.current) {
         Array.isArray(element)
           ? element.forEach((el) => el.remove())
           : element.remove();
@@ -80,15 +77,27 @@ const Canvas: FunctionComponent = () => {
     }
   };
 
-  const joinSession = async () => {
-    if (!zoomClient.current) return;
+  const joinSessionWithToken = async () => {
     const sessionName = "mysession-1"; // Replace with your session name
     const jwt = await getToken(sessionName);
     const userName = `User-${new Date().getTime().toString().slice(8)}`;
+    await joinSession(sessionName, jwt, userName);
+  };
+
+  const joinSession = async (
+    sessionName: string,
+    jwt: string,
+    userName: string
+  ) => {
+    zoomClient.current.init("en-US", "Global", { patchJsMedia: true });
+    zoomClient.current.on("peer-video-state-change", renderVideo);
+
     await zoomClient.current.join(sessionName, jwt, userName);
 
-    await myStream.current?.startVideo();
-    await myStream.current?.startAudio();
+    const stream = zoomClient.current.getMediaStream();
+
+    await stream.startVideo();
+    await stream.startAudio();
     await renderVideo({
       action: "Start",
       userId: zoomClient.current.getCurrentUserInfo().userId,
@@ -97,7 +106,8 @@ const Canvas: FunctionComponent = () => {
 
   const leaveSession = async () => {
     if (!zoomClient.current) return;
-    myStream.current?.stopVideo();
+    const stream = zoomClient.current.getMediaStream();
+    stream.stopVideo();
     renderVideo({
       action: "Stop",
       userId: zoomClient.current.getCurrentUserInfo().userId,
@@ -108,20 +118,31 @@ const Canvas: FunctionComponent = () => {
 
   useEffect(() => {
     if (zoomClient.current) {
-      zoomClient.current.init("en-US", "Global", { patchJsMedia: true });
-      myStream.current = zoomClient.current.getMediaStream();
-      zoomClient.current.on("peer-video-state-change", renderVideo);
-      window.videoController = { joinSession, leaveSession }; // Expose joinSession globally for testing
+      window.videoController = {
+        joinSessionWithToken,
+        joinSession,
+        leaveSession,
+      };
     }
   }, []);
 
   return (
-    /* @ts-expect-error html component */
-    <video-player-container ref={ref}>
-      <div id="main-video"></div>
-      <div id="secondary-video"></div>
-      {/* @ts-expect-error html component */}
-    </video-player-container>
+    <div className="canvas-container">
+      <div id="main-video">
+        {/* @ts-expect-error html component */}
+        <video-player-container
+          ref={mainVideoRef}
+          style={{ width: "100%", height: "100vh", overflow: "hidden" }}
+        />
+      </div>
+      <div id="secondary-video">
+        {/* @ts-expect-error html component */}
+        <video-player-container
+          ref={secondaryVideoRef}
+          style={{ width: "200px", height: "150px", overflow: "hidden" }}
+        />
+      </div>
+    </div>
   );
 };
 
