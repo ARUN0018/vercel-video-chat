@@ -139,17 +139,64 @@ const Canvas: FunctionComponent = () => {
   }, []);
 
   return (
-    <div className="canvas-container">
-      <div id="main-video">
+    <div
+      style={{
+        position: "absolute",
+        display: "block",
+        width: "100%",
+        height: "100vh",
+        overflow: "hidden",
+      }}
+    >
+      <div
+        id="main-video"
+        style={{
+          position: "absolute",
+          top: "0",
+          left: "0",
+          width: "100%",
+          height: " 100%",
+          backgroundColor: "cadetblue",
+        }}
+      >
         {/* @ts-expect-error html component */}
         <video-player-container ref={mainVideoRef} />
       </div>
-      <div id="secondary-video">
+      <div
+        id="secondary-video"
+        style={{
+          position: "absolute",
+          bottom: "100px",
+          right: "10px",
+          width: "150px",
+          height: "200px",
+          border: "2px solid #fff",
+          backgroundColor: "black",
+        }}
+      >
         {/* @ts-expect-error html component */}
-        <video-player-container ref={secondaryVideoRef} />
+        <video-player-container
+          ref={secondaryVideoRef}
+          style={{ width: "100%", height: "auto", aspectRatio: 16 / 9 }}
+        />
       </div>
       {/* {inSession ? ( */}
-      <div className="icon">
+      <div
+        style={{
+          position: "absolute",
+          bottom: "20px",
+          left: "50%",
+          transform: "translateX(-50%)",
+          display: "flex",
+          gap: "10px",
+          zIndex: 9999,
+          // z-index: 9999,
+          background: "black",
+          padding: "10px 20px",
+          borderRadius: "12px",
+          // border-radius: "12px"
+        }}
+      >
         <VideoButton
           client={zoomClient}
           isVideoMuted={isVideoMuted}

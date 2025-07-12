@@ -31,7 +31,15 @@ export const VideoButton = (props: {
     }
   };
   return (
-    <button className="video-button" onClick={onCameraClick}>
+    <button
+      className="video-button"
+      style={{
+        height: "50px",
+        width: "50px",
+        borderRadius: "50px",
+      }}
+      onClick={onCameraClick}
+    >
       {isVideoMuted ? (
         <Image src="/video-off.svg" alt={""} width={30} height={30} />
       ) : (
@@ -56,7 +64,15 @@ export const AudioButton = (props: {
     setIsAudioMuted(client.current.getCurrentUserInfo().muted ?? true);
   };
   return (
-    <button className="audio-button" onClick={onAudioClick}>
+    <button
+      className="audio-button"
+      onClick={onAudioClick}
+      style={{
+        height: "50px",
+        width: "50px",
+        borderRadius: "50px",
+      }}
+    >
       {isAudioMuted ? (
         <Image src="/mic-off.svg" alt={""} width={30} height={30} style={{}} />
       ) : (
@@ -80,7 +96,16 @@ export const CallButton = (props: { action: () => Promise<void> }) => {
   };
 
   return (
-    <button className="call-end" onClick={onCallClick}>
+    <button
+      className="call-end"
+      onClick={onCallClick}
+      style={{
+        backgroundColor: "red",
+        height: "50px",
+        width: "50px",
+        borderRadius: "50px",
+      }}
+    >
       <Image
         src="/call.svg"
         alt={""}
