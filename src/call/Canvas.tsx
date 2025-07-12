@@ -191,7 +191,7 @@ const Canvas: FunctionComponent = () => {
           gap: "10px",
           zIndex: 9999,
           // z-index: 9999,
-          background: "black",
+          backgroundColor: "black",
           padding: "10px 20px",
           borderRadius: "12px",
           // border-radius: "12px"
