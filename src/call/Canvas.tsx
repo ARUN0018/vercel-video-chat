@@ -1,11 +1,11 @@
 import ZoomVideo, {
   ExecutedFailure,
-  Stream,
   VideoPlayer,
   VideoQuality,
 } from "@zoom/videosdk";
-import { FunctionComponent, useEffect, useRef } from "react";
+import { FunctionComponent, useEffect, useRef, useState } from "react";
 import "./Canvas.css"; // Assuming you have some styles for the video player
+import { AudioButton, CallButton, VideoButton } from "../controls/buttons";
 
 // Allow usage of <video-player-container> as a custom element in JSX
 declare global {
@@ -40,7 +40,15 @@ const Canvas: FunctionComponent = () => {
   const zoomClient = useRef<ReturnType<typeof ZoomVideo.createClient>>(
     ZoomVideo.createClient()
   );
-
+  const [inSession, setInSession] = useState(false);
+  const [isVideoMuted, setIsVideoMuted] = useState(
+    !zoomClient.current.getCurrentUserInfo()?.bVideoOn
+  );
+  console.log(`isVideo: ${!zoomClient.current.getCurrentUserInfo()?.bVideoOn}`);
+  const [isAudioMuted, setIsAudioMuted] = useState(
+    zoomClient.current.getCurrentUserInfo()?.muted ?? true
+  );
+  console.log(`isAudio:${zoomClient.current.getCurrentUserInfo()?.muted} `);
   const renderVideo = async (event: {
     action: "Start" | "Stop";
     userId: number;
@@ -93,11 +101,15 @@ const Canvas: FunctionComponent = () => {
     zoomClient.current.on("peer-video-state-change", renderVideo);
 
     await zoomClient.current.join(sessionName, jwt, userName);
+    setInSession(true);
 
     const stream = zoomClient.current.getMediaStream();
-
     await stream.startVideo();
+    setIsVideoMuted(!stream.isCapturingVideo());
+    console.log(`capturing video: ${!stream.isCapturingVideo()}`);
     await stream.startAudio();
+    setIsAudioMuted(stream.isAudioMuted());
+    console.log(`audio muted: ${stream.isAudioMuted()}`);
     await renderVideo({
       action: "Start",
       userId: zoomClient.current.getCurrentUserInfo().userId,
@@ -130,18 +142,31 @@ const Canvas: FunctionComponent = () => {
     <div className="canvas-container">
       <div id="main-video">
         {/* @ts-expect-error html component */}
-        <video-player-container
-          ref={mainVideoRef}
-          style={{ width: "100%", height: "100vh", overflow: "hidden" }}
-        />
+        <video-player-container ref={mainVideoRef} />
       </div>
       <div id="secondary-video">
         {/* @ts-expect-error html component */}
-        <video-player-container
-          ref={secondaryVideoRef}
-          style={{ width: "200px", height: "150px", overflow: "hidden" }}
-        />
+        <video-player-container ref={secondaryVideoRef} />
       </div>
+      {/* {inSession ? ( */}
+      <div className="icon">
+        <VideoButton
+          client={zoomClient}
+          isVideoMuted={isVideoMuted}
+          setIsVideoMuted={setIsVideoMuted}
+          renderVideo={renderVideo}
+        />
+        <CallButton action={leaveSession} />
+        <AudioButton
+          client={zoomClient}
+          isAudioMuted={isAudioMuted}
+          setIsAudioMuted={setIsAudioMuted}
+        />
+        <button onClick={joinSessionWithToken}>join</button>
+      </div>
+      {/* ) : (
+          <div></div>
+        )} */}
     </div>
   );
 };

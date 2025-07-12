@@ -72,9 +72,15 @@ export const AudioButton = (props: {
   );
 };
 
-export const CallButton = () => {
+export const CallButton = (props: { action: () => Promise<void> }) => {
+  const { action } = props;
+
+  const onCallClick = async () => {
+    await action();
+  };
+
   return (
-    <button className="audio-button" style={{ backgroundColor: "red" }}>
+    <button className="call-end" onClick={onCallClick}>
       <Image
         src="/call.svg"
         alt={""}
