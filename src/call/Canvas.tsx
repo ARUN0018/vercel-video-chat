@@ -4,7 +4,7 @@ import ZoomVideo, {
   VideoQuality,
 } from "@zoom/videosdk";
 import { FunctionComponent, useEffect, useRef, useState } from "react";
-import "./Canvas.css"; // Assuming you have some styles for the video player
+// import "./Canvas.css"; // Assuming you have some styles for the video player
 import { AudioButton, CallButton, VideoButton } from "../controls/buttons";
 
 // Allow usage of <video-player-container> as a custom element in JSX
