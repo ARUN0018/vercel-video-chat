@@ -7,28 +7,31 @@
 }
 
 .canvas-container #main-video {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
   position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
-  background-color: cadetblue;
+  background-color: black;
 }
 
 .canvas-container #secondary-video {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
   position: absolute;
-  bottom: 100px;
+  top: 10px;
   right: 10px;
-  width: 150px;
-  height: 200px;
-  border: 2px solid #fff;
-  background-color: rgba(0, 0, 0, 0.5);
+  width: 30vw;
+  height: auto;
+  aspect-ratio: 9/16;
 }
 
 video-player {
-  width: 100%;
+  display: block;
   height: auto;
-  aspect-ratio: 16/9;
+  aspect-ratio: 9/16;
 }
 
 .video-button {

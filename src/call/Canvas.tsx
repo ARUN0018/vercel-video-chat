@@ -4,7 +4,7 @@ import ZoomVideo, {
   VideoQuality,
 } from "@zoom/videosdk";
 import { FunctionComponent, useEffect, useRef, useState } from "react";
-// import "./Canvas.css"; // Assuming you have some styles for the video player
+import "./canvas.css"; // Assuming you have some styles for the video player
 import { AudioButton, CallButton, VideoButton } from "../controls/buttons";
 
 // Allow usage of <video-player-container> as a custom element in JSX
@@ -119,7 +119,6 @@ const Canvas: FunctionComponent = () => {
   const leaveSession = async () => {
     if (!zoomClient.current) return;
     const stream = zoomClient.current.getMediaStream();
-    stream.stopVideo();
     renderVideo({
       action: "Stop",
       userId: zoomClient.current.getCurrentUserInfo().userId,
@@ -139,64 +138,17 @@ const Canvas: FunctionComponent = () => {
   }, []);
 
   return (
-    <div
-      style={{
-        position: "absolute",
-        display: "block",
-        width: "100%",
-        height: "100vh",
-        overflow: "hidden",
-      }}
-    >
-      <div
-        id="main-video"
-        style={{
-          position: "absolute",
-          top: "0",
-          left: "0",
-          width: "100%",
-          height: " 100%",
-          backgroundColor: "cadetblue",
-        }}
-      >
+    <div className="canvas-container">
+      <div id="main-video">
         {/* @ts-expect-error html component */}
         <video-player-container ref={mainVideoRef} />
       </div>
-      <div
-        id="secondary-video"
-        style={{
-          position: "absolute",
-          bottom: "100px",
-          right: "10px",
-          width: "150px",
-          height: "200px",
-          border: "2px solid #fff",
-          backgroundColor: "black",
-        }}
-      >
+      <div id="secondary-video">
         {/* @ts-expect-error html component */}
-        <video-player-container
-          ref={secondaryVideoRef}
-          style={{ width: "100%", height: "auto", aspectRatio: 16 / 9 }}
-        />
+        <video-player-container ref={secondaryVideoRef} />
       </div>
       {/* {inSession ? ( */}
-      <div
-        style={{
-          position: "absolute",
-          bottom: "20px",
-          left: "50%",
-          transform: "translateX(-50%)",
-          display: "flex",
-          gap: "10px",
-          zIndex: 9999,
-          // z-index: 9999,
-          backgroundColor: "black",
-          padding: "10px 20px",
-          borderRadius: "12px",
-          // border-radius: "12px"
-        }}
-      >
+      <div className="icon">
         <VideoButton
           client={zoomClient}
           isVideoMuted={isVideoMuted}
