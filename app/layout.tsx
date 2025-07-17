@@ -10,7 +10,7 @@ const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
   title: "video-chat",
-  description: "vide0 chat",
+  description: "video chat",
   // icons: {
   //   icon: "/favicon.svg",
   // },

@@ -1,76 +1,58 @@
 .canvas-container {
-  position: absolute;
-  display: block;
-  width: 100%;
+  position: relative;
+  width: 100vw;
   height: 100vh;
-  overflow: "hidden";
 }
 
 .canvas-container #main-video {
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
   position: absolute;
-  width: 100%;
-  height: 100%;
+  width: 100vw;
+  left: 0;
+  top: 0;
+  height: 100vh;
   background-color: black;
 }
 
 .canvas-container #secondary-video {
-  display: flex;
-  justify-content: center;
-  flex-direction: column;
   position: absolute;
-  top: 10px;
-  right: 10px;
+  top: 20px;
+  right: 20px;
   width: 30vw;
-  height: auto;
-  aspect-ratio: 9/16;
+  height: 25vh;
 }
 
-video-player {
-  display: block;
-  height: auto;
-  aspect-ratio: 9/16;
+#main-video video-player {
+  width: 100vw;
+  height: 100vh;
+}
+
+#secondary-video video-player {
+  width: 30vw;
+  height: 25vh;
+}
+
+video {
+  object-fit: cover;
 }
 
 .video-button {
   height: 50px;
   width: 50px;
   border-radius: 50px;
-  /* 
-  background-color: transparent;
-  border: none;
-  position: absolute;
-  bottom: 10px;
-  right: 10px;
-  font-size: 16px; */
 }
 
 .audio-button {
   height: 50px;
   width: 50px;
   border-radius: 50px;
-  /* 
-  background-color: transparent;
-  border: none;
-  position: absolute;
-  bottom: 10px;
-  left: 10px;
-  font-size: 16px; */
 }
 .call-end {
   height: 50px;
   width: 50px;
   border-radius: 50px;
   background-color: red;
-  /*
-  position: center;
-  border: none;
-  bottom: 10px;
-  font-size: 16px; */
 }
-.icon {
+.action-button {
   position: absolute;
   bottom: 20px;
   left: 50%;
@@ -81,4 +63,50 @@ video-player {
   background: rgba(0, 0, 0, 0.6);
   padding: 10px 20px;
   border-radius: 12px;
+}
+.center-content {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  position: absolute;
+  align-items: center;
+  justify-content: center;
+}
+.calling {
+  font-size: larger;
+  color: white;
+  position: relative;
+}
+.letter {
+  color: white;
+  position: relative;
+  font-size: larger;
+  animation-name: connection;
+  animation-duration: 5s;
+  opacity: 0;
+  animation-timing-function: forwards;
+  animation-iteration-count: infinite;
+}
+.letter:first-child {
+  animation-delay: 0s;
+}
+
+.letter:nth-child(2) {
+  animation-delay: 0.1s;
+}
+
+.letter:nth-child(3) {
+  animation-delay: 0.2s;
+}
+
+@keyframes connection {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
