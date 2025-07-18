@@ -9,7 +9,7 @@ import ZoomVideo, {
 import { FunctionComponent, useEffect, useRef, useState } from "react";
 import "./canvas.css"; // Assuming you have some styles for the video player
 import { AudioButton, CallButton, VideoButton } from "../controls/buttons";
-import { Avatar, Calling } from "../components/ui";
+import { Avatar, CallEnd, Calling } from "../components/ui";
 
 // Allow usage of <video-player-container> as a custom element in JSX
 declare global {
@@ -170,7 +170,9 @@ const Canvas: FunctionComponent = () => {
     }
   }, []);
 
-  return (
+  return callingState === "call-end" ? (
+    <CallEnd />
+  ) : (
     <div className="canvas-container">
       <div id="main-video">
         {callingState === "calling" ? (

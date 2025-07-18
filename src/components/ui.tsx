@@ -1,5 +1,3 @@
-import { relative } from "path";
-
 export const Avatar = (props: { name: string }) => {
   const { name } = props;
   return (
@@ -8,7 +6,7 @@ export const Avatar = (props: { name: string }) => {
         src={"/avatar.svg"}
         style={{
           padding: "10px",
-          width: "100%",
+          width: "50%",
           justifyContent: "center",
           alignItems: "center",
           display: "flex",
@@ -28,6 +26,14 @@ export const Calling = () => {
         <span className="letter">.</span>
         <span className="letter">.</span>
       </p>
+    </div>
+  );
+};
+
+export const CallEnd = () => {
+  return (
+    <div className="center-content">
+      <p>Call End</p>
     </div>
   );
 };
