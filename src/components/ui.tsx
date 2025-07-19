@@ -2,17 +2,7 @@ export const Avatar = (props: { name: string }) => {
   const { name } = props;
   return (
     <div className="center-content">
-      <img
-        src={"/avatar.svg"}
-        style={{
-          padding: "10px",
-          width: "50%",
-          justifyContent: "center",
-          alignItems: "center",
-          display: "flex",
-          position: "relative",
-        }}
-      />
+      <div className="avatar">{name == "" ? "U" : name.charAt(0)}</div>
       <div style={{ color: "white" }}>{name}</div>
     </div>
   );

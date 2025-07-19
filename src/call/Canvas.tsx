@@ -81,6 +81,7 @@ const Canvas: FunctionComponent = () => {
             child.remove();
           }
           secondaryVideoRef.current.appendChild(userVideo as VideoPlayer);
+          secondaryVideoRef.current.querySelector("video")?.play();
           setHostVideoMuted(false);
         } else {
           const childNode = mainVideoRef.current.childNodes;
