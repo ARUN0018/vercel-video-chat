@@ -35,17 +35,12 @@ video {
   object-fit: cover;
 }
 
-.video-button {
+.button {
   height: 50px;
   width: 50px;
   border-radius: 50px;
 }
 
-.audio-button {
-  height: 50px;
-  width: 50px;
-  border-radius: 50px;
-}
 .call-end {
   height: 50px;
   width: 50px;
@@ -60,7 +55,7 @@ video {
   display: flex;
   gap: 10px;
   z-index: 9999;
-  background: rgba(0, 0, 0, 0.6);
+  background: rgba(233, 227, 227, 0.753);
   padding: 10px 20px;
   border-radius: 12px;
 }
@@ -120,4 +115,17 @@ video {
   align-items: center;
   justify-content: center;
   font-size: 200%;
+}
+
+.action-label {
+  position: absolute;
+  bottom: 100px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 10px;
+  z-index: 9999;
+  background: rgba(233, 227, 227, 0.753);
+  padding: 10px 20px;
+  border-radius: 12px;
 }

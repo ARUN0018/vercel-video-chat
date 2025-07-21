@@ -2,13 +2,19 @@
 
 import ZoomVideo, {
   ExecutedFailure,
+  MediaDevice,
   ParticipantPropertiesPayload,
   VideoPlayer,
   VideoQuality,
 } from "@zoom/videosdk";
 import { FunctionComponent, useEffect, useRef, useState } from "react";
 import "./canvas.css"; // Assuming you have some styles for the video player
-import { AudioButton, CallButton, VideoButton } from "../controls/buttons";
+import {
+  AudioButton,
+  CallButton,
+  SpeakerButton,
+  VideoButton,
+} from "../controls/buttons";
 import { Avatar, CallEnd, Calling } from "../components/ui";
 
 // Allow usage of <video-player-container> as a custom element in JSX
@@ -50,7 +56,12 @@ const Canvas: FunctionComponent = () => {
   const [hostVideoMuted, setHostVideoMuted] = useState(true);
   const [hostAudioMuted, setHostAudioMuted] = useState(true);
   const [hostname, setHostname] = useState("");
+  const [hostSpeakerList, setHostSpeakerList] = useState<MediaDevice[]>([]);
+  const [hostSelectedSpeaker, setHostSelectedSpeaker] = useState<string>("");
+  const [hostMicList, setHostmicList] = useState<MediaDevice[]>([]);
+  const [hostSelectedMic, setHostSelectedMic] = useState<string>("");
 
+  const [hostCameraList, setHostCameraList] = useState<MediaDevice[]>([]);
   const [userVideoMuted, setUserVideoMuted] = useState(true);
   const [userAudioMuted, setUserAudioMuted] = useState(true);
   const [userName, setUsername] = useState("");
@@ -132,13 +143,22 @@ const Canvas: FunctionComponent = () => {
   ) => {
     await zoomClient.current.init("en-US", "Global", { patchJsMedia: true });
     zoomClient.current.on("peer-video-state-change", renderVideo);
-
     await zoomClient.current.join(sessionName, jwt, userName);
     setHostname(userName);
 
     const stream = zoomClient.current.getMediaStream();
     await stream.startVideo();
     await stream.startAudio();
+    const speakerList = stream.getSpeakerList();
+    speakerList.shift();
+    setHostSpeakerList(speakerList);
+    switchHostSpeaker(speakerList[0].deviceId);
+    const micList = stream.getMicList();
+    micList.shift();
+    setHostmicList(micList);
+    switchHostMic(micList[0].deviceId);
+
+    // render
     setHostAudioMuted(false);
     await renderVideo({
       action: "Start",
@@ -147,6 +167,22 @@ const Canvas: FunctionComponent = () => {
 
     zoomClient.current.on("user-added", userAdded);
     zoomClient.current.on("user-removed", userRemoved);
+  };
+
+  const switchHostSpeaker = async (id: string) => {
+    const stream = zoomClient.current.getMediaStream();
+    if (stream) {
+      await stream.switchSpeaker(id);
+      setHostSelectedSpeaker(id);
+    }
+  };
+
+  const switchHostMic = async (id: string) => {
+    const stream = zoomClient.current.getMediaStream();
+    if (stream) {
+      await stream.switchMicrophone(id);
+      setHostSelectedMic(id);
+    }
   };
 
   const leaveSession = async () => {
@@ -196,7 +232,26 @@ const Canvas: FunctionComponent = () => {
         <video-player-container ref={secondaryVideoRef} />
       </div>
       {/* {inSession ? ( */}
+      <div className="action-label">
+        <div>
+          {
+            hostSpeakerList.filter((s) => s.deviceId === hostSelectedSpeaker)[0]
+              ?.label
+          }
+        </div>
+        <div>
+          {hostMicList.filter((s) => s.deviceId === hostSelectedMic)[0]?.label}
+        </div>
+      </div>
       <div className="action-button">
+        <button className="button" onClick={joinSessionWithToken}>
+          join
+        </button>
+        <SpeakerButton
+          list={hostSpeakerList}
+          active={hostSelectedSpeaker}
+          setActive={switchHostSpeaker}
+        />
         <VideoButton
           client={zoomClient}
           isVideoMuted={hostVideoMuted}
@@ -208,7 +263,6 @@ const Canvas: FunctionComponent = () => {
           isAudioMuted={hostAudioMuted}
           setIsAudioMuted={setHostAudioMuted}
         />
-        <button onClick={joinSessionWithToken}>join</button>
       </div>
       {/* ) : (
           <div></div>

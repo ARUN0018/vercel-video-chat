@@ -1,5 +1,6 @@
-import type { VideoClient } from "@zoom/videosdk";
+import type { MediaDevice, VideoClient } from "@zoom/videosdk";
 import Image from "next/image";
+import { useEffect, useState } from "react";
 
 export const VideoButton = (props: {
   client: React.RefObject<typeof VideoClient>;
@@ -28,7 +29,7 @@ export const VideoButton = (props: {
     }
   };
   return (
-    <button className="video-button" onClick={onCameraClick}>
+    <button className="button" onClick={onCameraClick}>
       {isVideoMuted ? (
         <Image src="/video-off.svg" alt={""} width={30} height={30} />
       ) : (
@@ -53,7 +54,7 @@ export const AudioButton = (props: {
     setIsAudioMuted(client.current.getCurrentUserInfo().muted ?? true);
   };
   return (
-    <button className="audio-button" onClick={onAudioClick}>
+    <button className="button" onClick={onAudioClick}>
       {isAudioMuted ? (
         <Image src="/mic-off.svg" alt={"mic-off.svg"} width={30} height={30} />
       ) : (
@@ -74,5 +75,51 @@ export const CallButton = (props: { action: () => Promise<void> }) => {
     <button className="call-end" onClick={onCallClick}>
       <Image src="/call.svg" alt={"call.svg"} width={30} height={15} />
     </button>
+  );
+};
+
+export const SpeakerButton = (props: {
+  list: MediaDevice[];
+  active: string;
+  setActive: (id: string) => void;
+}) => {
+  const { list, active, setActive } = props;
+  const [isOpen, setIsOpen] = useState(false);
+
+  return (
+    <div style={{ position: "relative", height: "50px", width: "50px" }}>
+      <div
+        style={{
+          position: "absolute",
+          display: "flex",
+          flexDirection: "column",
+          bottom: 0,
+        }}
+      >
+        {isOpen ? (
+          list.map((s) => (
+            <button
+              className="button"
+              color="white"
+              key={s.deviceId}
+              onClick={() => {
+                setActive(s.deviceId);
+                setIsOpen(false);
+              }}
+            >
+              {s.label.charAt(0) ?? "s"}
+            </button>
+          ))
+        ) : (
+          <button
+            className="button"
+            onClick={() => (list.length > 1 ? setIsOpen(true) : null)}
+          >
+            {list.filter((s) => s.deviceId === active)[0]?.label?.charAt(0) ??
+              "S"}
+          </button>
+        )}
+      </div>
+    </div>
   );
 };
