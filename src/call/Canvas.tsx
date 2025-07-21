@@ -150,9 +150,10 @@ const Canvas: FunctionComponent = () => {
     await stream.startVideo();
     await stream.startAudio();
     const speakerList = stream.getSpeakerList();
+    console.log("speakerList", speakerList);
     speakerList.shift();
     setHostSpeakerList(speakerList);
-    console.log("speakerList", setHostSpeakerList);
+    console.log("speakerList", speakerList);
     switchHostSpeaker(speakerList[0].deviceId);
     console.log("speakerId", speakerList[0].deviceId);
     // const micList = stream.getMicList();
