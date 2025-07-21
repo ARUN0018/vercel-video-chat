@@ -152,7 +152,9 @@ const Canvas: FunctionComponent = () => {
     const speakerList = stream.getSpeakerList();
     speakerList.shift();
     setHostSpeakerList(speakerList);
+    console.log("speakerList", setHostSpeakerList);
     switchHostSpeaker(speakerList[0].deviceId);
+    console.log("speakerId", speakerList[0].deviceId);
     // const micList = stream.getMicList();
     // micList.shift();
     // setHostmicList(micList);
@@ -170,10 +172,13 @@ const Canvas: FunctionComponent = () => {
   };
 
   const switchHostSpeaker = async (id: string) => {
+    console.log("switchHostSpeaker entered", "device id:", id);
+
     const stream = zoomClient.current.getMediaStream();
     if (stream) {
       await stream.switchSpeaker(id);
       setHostSelectedSpeaker(id);
+      console.log("switchHostSpeaker end");
     }
   };
 
