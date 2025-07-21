@@ -58,8 +58,8 @@ const Canvas: FunctionComponent = () => {
   const [hostname, setHostname] = useState("");
   const [hostSpeakerList, setHostSpeakerList] = useState<MediaDevice[]>([]);
   const [hostSelectedSpeaker, setHostSelectedSpeaker] = useState<string>("");
-  const [hostMicList, setHostmicList] = useState<MediaDevice[]>([]);
-  const [hostSelectedMic, setHostSelectedMic] = useState<string>("");
+  // const [hostMicList, setHostmicList] = useState<MediaDevice[]>([]);
+  // const [hostSelectedMic, setHostSelectedMic] = useState<string>("");
 
   const [hostCameraList, setHostCameraList] = useState<MediaDevice[]>([]);
   const [userVideoMuted, setUserVideoMuted] = useState(true);
@@ -153,10 +153,10 @@ const Canvas: FunctionComponent = () => {
     speakerList.shift();
     setHostSpeakerList(speakerList);
     switchHostSpeaker(speakerList[0].deviceId);
-    const micList = stream.getMicList();
-    micList.shift();
-    setHostmicList(micList);
-    switchHostMic(micList[0].deviceId);
+    // const micList = stream.getMicList();
+    // micList.shift();
+    // setHostmicList(micList);
+    // switchHostMic(micList[0].deviceId);
 
     // render
     setHostAudioMuted(false);
@@ -177,13 +177,13 @@ const Canvas: FunctionComponent = () => {
     }
   };
 
-  const switchHostMic = async (id: string) => {
-    const stream = zoomClient.current.getMediaStream();
-    if (stream) {
-      await stream.switchMicrophone(id);
-      setHostSelectedMic(id);
-    }
-  };
+  // const switchHostMic = async (id: string) => {
+  //   const stream = zoomClient.current.getMediaStream();
+  //   if (stream) {
+  //     await stream.switchMicrophone(id);
+  //     setHostSelectedMic(id);
+  //   }
+  // };
 
   const leaveSession = async () => {
     if (!zoomClient.current) return;
@@ -239,9 +239,9 @@ const Canvas: FunctionComponent = () => {
               ?.label
           }
         </div>
-        <div>
+        {/* <div>
           {hostMicList.filter((s) => s.deviceId === hostSelectedMic)[0]?.label}
-        </div>
+        </div> */}
       </div>
       <div className="action-button">
         <button className="button" onClick={joinSessionWithToken}>
