@@ -150,12 +150,7 @@ const Canvas: FunctionComponent = () => {
     await stream.startVideo();
     await stream.startAudio();
     const devices = await navigator.mediaDevices.enumerateDevices();
-    const speakerList = devices.filter(
-      (d) =>
-        d.kind === "audiooutput" &&
-        d.deviceId !== "default" &&
-        d.deviceId !== "communications"
-    );
+    const speakerList = devices.filter((d) => d.kind === "audiooutput");
     // const speakerList = stream.getSpeakerList();
     console.log("speakerList", JSON.stringify(speakerList));
     // speakerList.shift();
