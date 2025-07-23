@@ -13,6 +13,7 @@ import {
   AudioButton,
   CallButton,
   SpeakerButton,
+  SwitchCamera,
   VideoButton,
 } from "../controls/buttons";
 import { Avatar, CallEnd, Calling } from "../components/ui";
@@ -58,10 +59,12 @@ const Canvas: FunctionComponent = () => {
   const [hostname, setHostname] = useState("");
   const [hostSpeakerList, setHostSpeakerList] = useState<MediaDevice[]>([]);
   const [hostSelectedSpeaker, setHostSelectedSpeaker] = useState<string>("");
+  const [hostCameraList, setHostCameraList] = useState<MediaDevice[]>([]);
+  const [hostSelectedCamera, setHostSelectedCamera] = useState<string>("");
+  const [warningMessage, setWarningMessage] = useState(true);
   // const [hostMicList, setHostmicList] = useState<MediaDevice[]>([]);
   // const [hostSelectedMic, setHostSelectedMic] = useState<string>("");
 
-  const [hostCameraList, setHostCameraList] = useState<MediaDevice[]>([]);
   const [userVideoMuted, setUserVideoMuted] = useState(true);
   const [userAudioMuted, setUserAudioMuted] = useState(true);
   const [userName, setUsername] = useState("");
@@ -151,13 +154,14 @@ const Canvas: FunctionComponent = () => {
     await stream.startAudio();
     const devices = await navigator.mediaDevices.enumerateDevices();
     const speakerList = devices.filter((d) => d.kind === "audiooutput");
-    // const speakerList = stream.getSpeakerList();
     console.log("speakerList", JSON.stringify(speakerList));
-    // speakerList.shift();
     setHostSpeakerList(speakerList);
     console.log("speakerList", speakerList);
     switchHostSpeaker(speakerList[0].deviceId);
     console.log("speakerId", speakerList[0].deviceId);
+    const cameraList = devices.filter((d) => d.kind === "videoinput");
+    setHostCameraList(cameraList);
+    switchHostCamera(cameraList[0].deviceId);
     // const micList = stream.getMicList();
     // micList.shift();
     // setHostmicList(micList);
@@ -172,6 +176,17 @@ const Canvas: FunctionComponent = () => {
 
     zoomClient.current.on("user-added", userAdded);
     zoomClient.current.on("user-removed", userRemoved);
+  };
+
+  const switchHostCamera = async (id: string) => {
+    console.log("switchHostCamera entered", "device id:", id);
+
+    const stream = zoomClient.current.getMediaStream();
+    if (stream) {
+      await stream.switchCamera(id);
+      setHostSelectedCamera(id);
+      console.log("switchHostCamera end");
+    }
   };
 
   const switchHostSpeaker = async (id: string) => {
@@ -213,6 +228,9 @@ const Canvas: FunctionComponent = () => {
         zoomClient,
       };
     }
+    setTimeout(() => {
+      setWarningMessage(false);
+    }, 10 * 1000);
   }, []);
 
   return callingState === "call-end" ? (
@@ -220,6 +238,17 @@ const Canvas: FunctionComponent = () => {
   ) : (
     <div className="canvas-container">
       <div id="main-video">
+        {warningMessage ? (
+          <p
+            style={{
+              color: "white",
+              textAlign: "center",
+              fontSize: "smaller",
+            }}
+          >
+            For a better experience, please to use a headset...🎧
+          </p>
+        ) : null}
         {callingState === "calling" ? (
           <div>
             <Calling />
@@ -238,6 +267,13 @@ const Canvas: FunctionComponent = () => {
         {hostVideoMuted ? <Avatar name={hostname} /> : null}
         {/* @ts-expect-error html component */}
         <video-player-container ref={secondaryVideoRef} />
+        {hostCameraList.length > 1 && !hostVideoMuted ? (
+          <SwitchCamera
+            cameraList={hostCameraList}
+            selectedCamera={hostSelectedCamera}
+            setActive={switchHostCamera}
+          />
+        ) : null}
       </div>
       {/* {inSession ? ( */}
       <div className="action-label">

@@ -1,6 +1,6 @@
 import type { MediaDevice, VideoClient } from "@zoom/videosdk";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 
 export const VideoButton = (props: {
   client: React.RefObject<typeof VideoClient>;
@@ -121,5 +121,28 @@ export const SpeakerButton = (props: {
         )}
       </div>
     </div>
+  );
+};
+
+export const SwitchCamera = (props: {
+  cameraList: MediaDevice[];
+  selectedCamera: string;
+  setActive: (id: string) => void;
+}) => {
+  const { cameraList, selectedCamera, setActive } = props;
+  const onclick = (cameraList: MediaDevice[], selectedCamera: string) => {
+    if (cameraList[0].deviceId == selectedCamera) {
+      setActive(cameraList[1].deviceId);
+    } else {
+      setActive(cameraList[0].deviceId);
+    }
+  };
+  return (
+    <button
+      className="switch-camera"
+      onClick={() => onclick(cameraList, selectedCamera)}
+    >
+      &#x21ba;
+    </button>
   );
 };
