@@ -32,7 +32,7 @@ declare global {
 declare global {
   interface Window {
     videoController?: Record<string, unknown>;
-    Test: unknown;
+    Test: { postMessage: (data: string) => void };
   }
 }
 
@@ -195,7 +195,6 @@ const Canvas: FunctionComponent = () => {
         zoomClient,
         print,
       };
-      window.Test;
     }
     setTimeout(() => {
       setWarningMessage(false);
@@ -261,7 +260,12 @@ const Canvas: FunctionComponent = () => {
         className="button-container"
         style={{ bottom: showControls ? "20px" : "-100px" }}
       >
-        <button className="button" onClick={joinSessionWithToken}>
+        <button
+          className="button"
+          onClick={() => {
+            window.Test.postMessage("ZoomWebViewConsole: message from JS");
+          }}
+        >
           join
         </button>
         <VideoButton
