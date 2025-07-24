@@ -239,15 +239,17 @@ const Canvas: FunctionComponent = () => {
     <div className="canvas-container">
       <div id="main-video">
         {warningMessage ? (
-          <p
-            style={{
-              color: "white",
-              textAlign: "center",
-              fontSize: "smaller",
-            }}
-          >
-            For a better experience, please to use a headset...🎧
-          </p>
+          <div style={{ top: "30%", position: "absolute", width: "100%" }}>
+            <p
+              style={{
+                color: "white",
+                textAlign: "center",
+                fontSize: "smaller",
+              }}
+            >
+              For a better experience, please to use a headset...🎧
+            </p>
+          </div>
         ) : null}
         {callingState === "calling" ? (
           <div>
@@ -276,37 +278,22 @@ const Canvas: FunctionComponent = () => {
         ) : null}
       </div>
       {/* {inSession ? ( */}
-      <div className="action-label">
-        <div>
-          {
-            hostSpeakerList.filter((s) => s.deviceId === hostSelectedSpeaker)[0]
-              ?.label
-          }
-        </div>
-        {/* <div>
-          {hostMicList.filter((s) => s.deviceId === hostSelectedMic)[0]?.label}
-        </div> */}
-      </div>
-      <div className="action-button">
+      <div className="button-container">
         <button className="button" onClick={joinSessionWithToken}>
           join
         </button>
-        <SpeakerButton
-          list={hostSpeakerList}
-          active={hostSelectedSpeaker}
-          setActive={switchHostSpeaker}
-        />
+        <SpeakerButton />
         <VideoButton
           client={zoomClient}
           isVideoMuted={hostVideoMuted}
           renderVideo={renderVideo}
         />
-        <CallButton action={leaveSession} />
         <AudioButton
           client={zoomClient}
           isAudioMuted={hostAudioMuted}
           setIsAudioMuted={setHostAudioMuted}
         />
+        <CallButton action={leaveSession} />
       </div>
       {/* ) : (
           <div></div>

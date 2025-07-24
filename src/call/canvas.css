@@ -36,18 +36,21 @@ video {
 }
 
 .button {
+  border: none;
   height: 50px;
   width: 50px;
   border-radius: 50px;
 }
 
 .call-end {
+  border: none;
   height: 50px;
   width: 50px;
   border-radius: 50px;
   background-color: red;
 }
-.action-button {
+
+.button-container {
   position: absolute;
   bottom: 20px;
   left: 50%;
@@ -55,10 +58,11 @@ video {
   display: flex;
   gap: 10px;
   z-index: 9999;
-  background: rgba(233, 227, 227, 0.753);
+  background: #41403e7d;
   padding: 10px 20px;
   border-radius: 12px;
 }
+
 .center-content {
   width: 100%;
   height: 100%;
@@ -68,11 +72,13 @@ video {
   align-items: center;
   justify-content: center;
 }
+
 .calling {
   font-size: larger;
   color: white;
   position: relative;
 }
+
 .letter {
   color: white;
   position: relative;
@@ -83,6 +89,7 @@ video {
   animation-timing-function: forwards;
   animation-iteration-count: infinite;
 }
+
 .letter:first-child {
   animation-delay: 0s;
 }
@@ -105,6 +112,7 @@ video {
     transform: translateY(0);
   }
 }
+
 .avatar {
   height: auto;
   width: 50%;
@@ -116,25 +124,15 @@ video {
   justify-content: center;
   font-size: 200%;
 }
-.action-label {
-  position: absolute;
-  bottom: 100px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 10px;
-  z-index: 9999;
-  background: rgba(233, 227, 227, 0.753);
-  padding: 10px 20px;
-  border-radius: 12px;
-}
+
 .switch-camera {
-  bottom: 0px;
+  background-color: #41403e7d;
+  top: 10px;
   position: absolute;
   right: 10px;
-  border-radius: 50px;
-  width: 35px;
   height: auto;
-  font-size: 130%;
-  opacity: 60%;
+  border: none;
+  height: 35px;
+  width: 35px;
+  border-radius: 50px;
 }

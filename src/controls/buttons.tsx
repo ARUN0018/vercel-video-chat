@@ -1,6 +1,5 @@
 import type { MediaDevice, VideoClient } from "@zoom/videosdk";
 import Image from "next/image";
-import { useState } from "react";
 
 export const VideoButton = (props: {
   client: React.RefObject<typeof VideoClient>;
@@ -78,49 +77,11 @@ export const CallButton = (props: { action: () => Promise<void> }) => {
   );
 };
 
-export const SpeakerButton = (props: {
-  list: MediaDevice[];
-  active: string;
-  setActive: (id: string) => void;
-}) => {
-  const { list, active, setActive } = props;
-  const [isOpen, setIsOpen] = useState(false);
-
+export const SpeakerButton = () => {
   return (
-    <div style={{ position: "relative", height: "50px", width: "50px" }}>
-      <div
-        style={{
-          position: "absolute",
-          display: "flex",
-          flexDirection: "column",
-          bottom: 0,
-        }}
-      >
-        {isOpen ? (
-          list.map((s) => (
-            <button
-              className="button"
-              color="white"
-              key={s.deviceId}
-              onClick={() => {
-                setActive(s.deviceId);
-                setIsOpen(false);
-              }}
-            >
-              {s.label.charAt(0) ?? "s"}
-            </button>
-          ))
-        ) : (
-          <button
-            className="button"
-            onClick={() => (list.length > 1 ? setIsOpen(true) : null)}
-          >
-            {list.filter((s) => s.deviceId === active)[0]?.label?.charAt(0) ??
-              "S"}
-          </button>
-        )}
-      </div>
-    </div>
+    <button className="button">
+      <Image src="/speaker.svg" alt={"speaker.svg"} width={30} height={30} />
+    </button>
   );
 };
 
@@ -142,7 +103,13 @@ export const SwitchCamera = (props: {
       className="switch-camera"
       onClick={() => onclick(cameraList, selectedCamera)}
     >
-      &#x21ba;
+      <Image
+        src="/switch-camera.svg"
+        alt={"switch-camera"}
+        width={20}
+        height={20}
+        style={{ fill: "white" }}
+      />
     </button>
   );
 };
