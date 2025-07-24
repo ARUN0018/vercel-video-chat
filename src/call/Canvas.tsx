@@ -32,7 +32,7 @@ declare global {
 declare global {
   interface Window {
     videoController?: Record<string, unknown>;
-    Test: Record<string, unknown>;
+    Test: unknown;
   }
 }
 
@@ -166,13 +166,10 @@ const Canvas: FunctionComponent = () => {
   };
 
   const switchHostCamera = async (id: string) => {
-    console.log("switchHostCamera entered", "device id:", id);
-
     const stream = zoomClient.current.getMediaStream();
     if (stream) {
       await stream.switchCamera(id);
       setHostSelectedCamera(id);
-      console.log("switchHostCamera end");
     }
   };
 
@@ -187,10 +184,6 @@ const Canvas: FunctionComponent = () => {
     setCallingState("call-end");
   };
 
-  const postMessage = () => {
-    console.log("ZoomWebViewConsole Test: javascript to flutter");
-  };
-
   useEffect(() => {
     if (zoomClient.current) {
       window.videoController = {
@@ -199,9 +192,7 @@ const Canvas: FunctionComponent = () => {
         leaveSession,
         zoomClient,
       };
-      window.Test = {
-        postMessage,
-      };
+      window.Test;
     }
     setTimeout(() => {
       setWarningMessage(false);
@@ -240,9 +231,9 @@ const Canvas: FunctionComponent = () => {
         {callingState === "calling" ? (
           <div>
             <Calling />
-            <audio autoPlay loop>
+            {/* <audio autoPlay loop>
               <source src={"/ringtone.mp3"} type="audio/mpeg" />
-            </audio>
+            </audio> */}
           </div>
         ) : null}
         {callingState === "in-call" && userVideoMuted ? (
