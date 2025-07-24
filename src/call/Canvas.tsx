@@ -12,7 +12,6 @@ import "./canvas.css"; // Assuming you have some styles for the video player
 import {
   AudioButton,
   CallButton,
-  SpeakerButton,
   SwitchCamera,
   VideoButton,
 } from "../controls/buttons";
@@ -33,6 +32,7 @@ declare global {
 declare global {
   interface Window {
     videoController?: Record<string, unknown>;
+    Test: Record<string, unknown>;
   }
 }
 
@@ -57,13 +57,11 @@ const Canvas: FunctionComponent = () => {
   const [hostVideoMuted, setHostVideoMuted] = useState(true);
   const [hostAudioMuted, setHostAudioMuted] = useState(true);
   const [hostname, setHostname] = useState("");
-  const [hostSpeakerList, setHostSpeakerList] = useState<MediaDevice[]>([]);
-  const [hostSelectedSpeaker, setHostSelectedSpeaker] = useState<string>("");
   const [hostCameraList, setHostCameraList] = useState<MediaDevice[]>([]);
   const [hostSelectedCamera, setHostSelectedCamera] = useState<string>("");
   const [warningMessage, setWarningMessage] = useState(true);
-  // const [hostMicList, setHostmicList] = useState<MediaDevice[]>([]);
-  // const [hostSelectedMic, setHostSelectedMic] = useState<string>("");
+  const [showControls, setShowControls] = useState(true);
+  const showControlsTimeout = useRef<ReturnType<typeof setTimeout>>(null);
 
   const [userVideoMuted, setUserVideoMuted] = useState(true);
   const [userAudioMuted, setUserAudioMuted] = useState(true);
@@ -153,19 +151,8 @@ const Canvas: FunctionComponent = () => {
     await stream.startVideo();
     await stream.startAudio();
     const devices = await navigator.mediaDevices.enumerateDevices();
-    const speakerList = devices.filter((d) => d.kind === "audiooutput");
-    console.log("speakerList", JSON.stringify(speakerList));
-    setHostSpeakerList(speakerList);
-    console.log("speakerList", speakerList);
-    switchHostSpeaker(speakerList[0].deviceId);
-    console.log("speakerId", speakerList[0].deviceId);
     const cameraList = devices.filter((d) => d.kind === "videoinput");
     setHostCameraList(cameraList);
-    switchHostCamera(cameraList[0].deviceId);
-    // const micList = stream.getMicList();
-    // micList.shift();
-    // setHostmicList(micList);
-    // switchHostMic(micList[0].deviceId);
 
     // render
     setHostAudioMuted(false);
@@ -189,25 +176,6 @@ const Canvas: FunctionComponent = () => {
     }
   };
 
-  const switchHostSpeaker = async (id: string) => {
-    console.log("switchHostSpeaker entered", "device id:", id);
-
-    const stream = zoomClient.current.getMediaStream();
-    if (stream) {
-      await stream.switchSpeaker(id);
-      setHostSelectedSpeaker(id);
-      console.log("switchHostSpeaker end");
-    }
-  };
-
-  // const switchHostMic = async (id: string) => {
-  //   const stream = zoomClient.current.getMediaStream();
-  //   if (stream) {
-  //     await stream.switchMicrophone(id);
-  //     setHostSelectedMic(id);
-  //   }
-  // };
-
   const leaveSession = async () => {
     if (!zoomClient.current) return;
     renderVideo({
@@ -219,6 +187,10 @@ const Canvas: FunctionComponent = () => {
     setCallingState("call-end");
   };
 
+  const postMessage = () => {
+    console.log("ZoomWebViewConsole Test: javascript to flutter");
+  };
+
   useEffect(() => {
     if (zoomClient.current) {
       window.videoController = {
@@ -227,16 +199,30 @@ const Canvas: FunctionComponent = () => {
         leaveSession,
         zoomClient,
       };
+      window.Test = {
+        postMessage,
+      };
     }
     setTimeout(() => {
       setWarningMessage(false);
     }, 10 * 1000);
+    showControlsNow();
   }, []);
+
+  const showControlsNow = () => {
+    setShowControls(true);
+    if (showControlsTimeout.current) {
+      clearTimeout(showControlsTimeout.current);
+    }
+    showControlsTimeout.current = setTimeout(() => {
+      setShowControls(false);
+    }, 10 * 1000);
+  };
 
   return callingState === "call-end" ? (
     <CallEnd />
   ) : (
-    <div className="canvas-container">
+    <div className="canvas-container" onClick={showControlsNow}>
       <div id="main-video">
         {warningMessage ? (
           <div style={{ top: "30%", position: "absolute", width: "100%" }}>
@@ -277,12 +263,13 @@ const Canvas: FunctionComponent = () => {
           />
         ) : null}
       </div>
-      {/* {inSession ? ( */}
-      <div className="button-container">
+      <div
+        className="button-container"
+        style={{ bottom: showControls ? "20px" : "-100px" }}
+      >
         <button className="button" onClick={joinSessionWithToken}>
           join
         </button>
-        <SpeakerButton />
         <VideoButton
           client={zoomClient}
           isVideoMuted={hostVideoMuted}
@@ -295,9 +282,6 @@ const Canvas: FunctionComponent = () => {
         />
         <CallButton action={leaveSession} />
       </div>
-      {/* ) : (
-          <div></div>
-        )} */}
     </div>
   );
 };

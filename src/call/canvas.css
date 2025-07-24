@@ -2,6 +2,7 @@
   position: relative;
   width: 100vw;
   height: 100vh;
+  overflow: hidden;
 }
 
 .canvas-container #main-video {
@@ -15,7 +16,7 @@
 
 .canvas-container #secondary-video {
   position: absolute;
-  top: 20px;
+  top: 40px;
   right: 20px;
   width: 30vw;
   height: 25vh;
@@ -54,6 +55,7 @@ video {
   position: absolute;
   bottom: 20px;
   left: 50%;
+  transition: bottom 1s;
   transform: translateX(-50%);
   display: flex;
   gap: 10px;

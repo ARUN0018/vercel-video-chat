@@ -77,14 +77,6 @@ export const CallButton = (props: { action: () => Promise<void> }) => {
   );
 };
 
-export const SpeakerButton = () => {
-  return (
-    <button className="button">
-      <Image src="/speaker.svg" alt={"speaker.svg"} width={30} height={30} />
-    </button>
-  );
-};
-
 export const SwitchCamera = (props: {
   cameraList: MediaDevice[];
   selectedCamera: string;
