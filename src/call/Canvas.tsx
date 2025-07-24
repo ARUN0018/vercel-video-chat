@@ -183,7 +183,9 @@ const Canvas: FunctionComponent = () => {
     await zoomClient.current.leave();
     setCallingState("call-end");
   };
-
+  const print = (message: string) => {
+    console.log(message);
+  };
   useEffect(() => {
     if (zoomClient.current) {
       window.videoController = {
@@ -191,6 +193,7 @@ const Canvas: FunctionComponent = () => {
         joinSession,
         leaveSession,
         zoomClient,
+        print,
       };
       window.Test;
     }
