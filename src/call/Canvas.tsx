@@ -201,12 +201,9 @@ const Canvas: FunctionComponent = () => {
       setWarningMessage(false);
     }, 10 * 1000);
     showControlsNow();
-    // window.Test.postMessage("start");
     const userAgent = window.navigator.userAgent;
     if (userAgent.includes("wv") || userAgent.includes("App-WebView")) {
-      console.log("Content is likely being viewed in a WebView.");
-    } else {
-      console.log("Content is likely being viewed in a standard browser.");
+      window.Test.postMessage("start");
     }
   }, []);
 
