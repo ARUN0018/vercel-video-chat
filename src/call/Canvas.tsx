@@ -32,7 +32,7 @@ declare global {
 declare global {
   interface Window {
     videoController?: Record<string, unknown>;
-    Test: { postMessage: (data: string) => void };
+    Test?: { postMessage: (data: string) => void };
   }
 }
 
@@ -184,9 +184,7 @@ const Canvas: FunctionComponent = () => {
     await zoomClient.current.leave();
     setCallingState("call-end");
   };
-  const print = (message: string) => {
-    console.log(message);
-  };
+
   useEffect(() => {
     if (zoomClient.current) {
       window.videoController = {
@@ -194,16 +192,14 @@ const Canvas: FunctionComponent = () => {
         joinSession,
         leaveSession,
         zoomClient,
-        print,
       };
     }
     setTimeout(() => {
       setWarningMessage(false);
     }, 10 * 1000);
     showControlsNow();
-    const userAgent = window.navigator.userAgent;
-    if (userAgent.includes("wv") || userAgent.includes("App-WebView")) {
-      window.Test.postMessage("start");
+    if (window.Test?.postMessage) {
+      window.Test?.postMessage("start");
     }
   }, []);
 
@@ -268,7 +264,7 @@ const Canvas: FunctionComponent = () => {
         <button
           className="button"
           onClick={() => {
-            window.Test.postMessage("ZoomWebViewConsole: message from JS");
+            window.Test?.postMessage("ZoomWebViewConsole: message from JS");
           }}
         >
           join
