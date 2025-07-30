@@ -32,7 +32,7 @@ declare global {
 declare global {
   interface Window {
     videoController?: Record<string, unknown>;
-    Test?: { postMessage: (data: string) => void };
+    Handler?: { postMessage: (data: string) => void };
   }
 }
 
@@ -130,6 +130,7 @@ const Canvas: FunctionComponent = () => {
   const userAdded = (p: ParticipantPropertiesPayload[]) => {
     if (p[0].userId != zoomClient.current?.getCurrentUserInfo().userId) {
       setUsername(p[0].displayName ?? "");
+      window.Handler?.postMessage(JSON.stringify({ type: "participantJoin" }));
     }
   };
 
@@ -183,6 +184,7 @@ const Canvas: FunctionComponent = () => {
     zoomClient.current.off("peer-video-state-change", renderVideo);
     await zoomClient.current.leave();
     setCallingState("call-end");
+    window.Handler?.postMessage(JSON.stringify({ type: "participantLeave" }));
   };
 
   useEffect(() => {
@@ -198,8 +200,8 @@ const Canvas: FunctionComponent = () => {
       setWarningMessage(false);
     }, 10 * 1000);
     showControlsNow();
-    if (window.Test?.postMessage) {
-      window.Test?.postMessage("start");
+    if (window.Handler?.postMessage) {
+      window.Handler?.postMessage(JSON.stringify({ type: "join" }));
     }
   }, []);
 
@@ -264,7 +266,7 @@ const Canvas: FunctionComponent = () => {
         <button
           className="button"
           onClick={() => {
-            window.Test?.postMessage("ZoomWebViewConsole: message from JS");
+            window.Handler?.postMessage("ZoomWebViewConsole: message from JS");
           }}
         >
           join
