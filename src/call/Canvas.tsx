@@ -141,11 +141,18 @@ const Canvas: FunctionComponent = () => {
   const joinSession = async (
     sessionName: string,
     jwt: string,
-    userName: string
+    userName: string,
+    sessionIdleTimeoutMins?: number
   ) => {
     await zoomClient.current.init("en-US", "Global", { patchJsMedia: true });
     zoomClient.current.on("peer-video-state-change", renderVideo);
-    await zoomClient.current.join(sessionName, jwt, userName);
+    await zoomClient.current.join(
+      sessionName,
+      jwt,
+      userName,
+      undefined,
+      sessionIdleTimeoutMins
+    );
     setHostname(userName);
 
     const stream = zoomClient.current.getMediaStream();
