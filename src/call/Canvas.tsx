@@ -36,15 +36,6 @@ declare global {
   }
 }
 
-const getToken = async (sessionName: string) => {
-  const response = await fetch(`/token?session=${sessionName}`);
-  if (!response.ok) {
-    throw new Error("Failed to fetch token");
-  }
-  const data = await response.json();
-  return data.token;
-};
-
 const Canvas: FunctionComponent = () => {
   const mainVideoRef = useRef<HTMLVideoElement>(null);
   const secondaryVideoRef = useRef<HTMLVideoElement>(null);
@@ -120,13 +111,6 @@ const Canvas: FunctionComponent = () => {
     }
   };
 
-  const joinSessionWithToken = async () => {
-    const sessionName = "mysession-1"; // Replace with your session name
-    const jwt = await getToken(sessionName);
-    const userName = `User-${new Date().getTime().toString().slice(8)}`;
-    await joinSession(sessionName, jwt, userName);
-  };
-
   const userAdded = (p: ParticipantPropertiesPayload[]) => {
     if (p[0].userId != zoomClient.current?.getCurrentUserInfo().userId) {
       setUsername(p[0].displayName ?? "");
@@ -141,18 +125,11 @@ const Canvas: FunctionComponent = () => {
   const joinSession = async (
     sessionName: string,
     jwt: string,
-    userName: string,
-    sessionIdleTimeoutMins?: number
+    userName: string
   ) => {
     await zoomClient.current.init("en-US", "Global", { patchJsMedia: true });
     zoomClient.current.on("peer-video-state-change", renderVideo);
-    await zoomClient.current.join(
-      sessionName,
-      jwt,
-      userName,
-      undefined,
-      sessionIdleTimeoutMins
-    );
+    await zoomClient.current.join(sessionName, jwt, userName, undefined, 2);
     setHostname(userName);
 
     const stream = zoomClient.current.getMediaStream();
@@ -197,10 +174,8 @@ const Canvas: FunctionComponent = () => {
   useEffect(() => {
     if (zoomClient.current) {
       window.videoController = {
-        joinSessionWithToken,
         joinSession,
         leaveSession,
-        zoomClient,
       };
     }
     setTimeout(() => {
