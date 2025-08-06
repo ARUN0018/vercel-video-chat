@@ -1,0 +1,39 @@
+stages:
+  - build
+  - deploy
+
+variables:
+  NEXT_PUBLIC_BASE_PATH: ""
+  NEXT_PUBLIC_ASSET_PREFIX: ""
+  NEXT_TELEMETRY_DISABLED: "1"
+  NODE_ENV: "production"
+  OUT_DIR: "out"
+
+cache:
+  paths:
+    - node_modules/
+
+before_script:
+  - npm ci
+
+build:
+  stage: build
+  script:
+    - npm run build
+  artifacts:
+    paths:
+      - $OUT_DIR
+    expire_in: 1 hour
+  only:
+    - main
+
+pages:
+  stage: deploy
+  script:
+    - rm -rf public
+    - mv $OUT_DIR public
+  artifacts:
+    paths:
+      - public
+  only:
+    - main

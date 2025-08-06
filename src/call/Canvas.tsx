@@ -1,6 +1,7 @@
 "use client";
 
 import ZoomVideo, {
+  ConnectionChangePayload,
   ExecutedFailure,
   MediaDevice,
   ParticipantPropertiesPayload,
@@ -122,6 +123,12 @@ const Canvas: FunctionComponent = () => {
     leaveSession();
   };
 
+  const connectionChange = (payload: ConnectionChangePayload) => {
+    if (payload.state === "Closed" || payload.state === "Fail") {
+      leaveSession();
+    }
+  };
+
   const joinSession = async (
     sessionName: string,
     jwt: string,
@@ -149,6 +156,7 @@ const Canvas: FunctionComponent = () => {
 
     zoomClient.current.on("user-added", userAdded);
     zoomClient.current.on("user-removed", userRemoved);
+    zoomClient.current.on("connection-change", connectionChange);
   };
 
   const switchHostCamera = async (id: string) => {
@@ -161,10 +169,6 @@ const Canvas: FunctionComponent = () => {
 
   const leaveSession = async () => {
     if (!zoomClient.current) return;
-    renderVideo({
-      action: "Stop",
-      userId: zoomClient.current.getCurrentUserInfo().userId,
-    });
     zoomClient.current.off("peer-video-state-change", renderVideo);
     await zoomClient.current.leave();
     setCallingState("call-end");
@@ -245,14 +249,6 @@ const Canvas: FunctionComponent = () => {
         className="button-container"
         style={{ bottom: showControls ? "20px" : "-100px" }}
       >
-        <button
-          className="button"
-          onClick={() => {
-            window.Handler?.postMessage("ZoomWebViewConsole: message from JS");
-          }}
-        >
-          join
-        </button>
         <VideoButton
           client={zoomClient}
           isVideoMuted={hostVideoMuted}
