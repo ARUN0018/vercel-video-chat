@@ -5,8 +5,6 @@ stages:
   - deploy
 
 variables:
-#  NEXT_TELEMETRY_DISABLED: "0"
-  NODE_ENV: "production"
   OUT_DIR: "out"
 
 cache:

@@ -19,8 +19,10 @@
   "devDependencies": {
     "@types/jsrsasign": "^10.5.15",
     "@types/node": "^20",
-    "@types/react": "^19.1.9",
+    "@types/react": "^19.0.0",
     "@types/react-dom": "^19",
+    "eslint": "^8",
+    "eslint-config-next": "15.3.5",
     "typescript": "^5.9.2"
   }
 }
