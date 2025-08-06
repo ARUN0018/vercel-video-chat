@@ -5,9 +5,7 @@ stages:
   - deploy
 
 variables:
-  NEXT_PUBLIC_BASE_PATH: ""
-  NEXT_PUBLIC_ASSET_PREFIX: ""
-  NEXT_TELEMETRY_DISABLED: "1"
+  NEXT_TELEMETRY_DISABLED: "0"
   NODE_ENV: "production"
   OUT_DIR: "out"
 
