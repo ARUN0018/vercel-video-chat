@@ -1,3 +1,5 @@
+image: node:22
+
 stages:
   - build
   - deploy
