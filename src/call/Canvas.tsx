@@ -37,7 +37,30 @@ declare global {
   }
 }
 
-const Canvas: FunctionComponent = () => {
+class FlutterNotification {
+  private static _postMessage(data: string) {
+    if (window.Handler?.postMessage) {
+      window.Handler.postMessage(data);
+    }
+  }
+
+  static ready() {
+    this._postMessage(JSON.stringify({ type: "ready" }));
+  }
+
+  static leaveSession() {
+    this._postMessage(JSON.stringify({ type: "leaveSession" }));
+  }
+
+  static participantJoin() {
+    this._postMessage(JSON.stringify({ type: "participantJoin" }));
+  }
+}
+
+const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
+  type,
+}) => {
+  console.log("Canvas type:", type);
   const mainVideoRef = useRef<HTMLVideoElement>(null);
   const secondaryVideoRef = useRef<HTMLVideoElement>(null);
   const zoomClient = useRef<ReturnType<typeof ZoomVideo.createClient>>(
@@ -53,6 +76,7 @@ const Canvas: FunctionComponent = () => {
   const [hostSelectedCamera, setHostSelectedCamera] = useState<string>("");
   const [warningMessage, setWarningMessage] = useState(true);
   const [showControls, setShowControls] = useState(true);
+  const [videoCall, setVideoCall] = useState(false);
   const showControlsTimeout = useRef<ReturnType<typeof setTimeout>>(null);
 
   const [userVideoMuted, setUserVideoMuted] = useState(true);
@@ -87,6 +111,8 @@ const Canvas: FunctionComponent = () => {
           secondaryVideoRef.current.appendChild(userVideo as VideoPlayer);
           secondaryVideoRef.current.querySelector("video")?.play();
           setHostVideoMuted(false);
+          console.log(`Host video status ${hostVideoMuted}`);
+          console.log(`Host video started for user ${event.userId}`);
         } else {
           const childNode = mainVideoRef.current.childNodes;
           for (const child of childNode) {
@@ -115,7 +141,7 @@ const Canvas: FunctionComponent = () => {
   const userAdded = (p: ParticipantPropertiesPayload[]) => {
     if (p[0].userId != zoomClient.current?.getCurrentUserInfo().userId) {
       setUsername(p[0].displayName ?? "");
-      window.Handler?.postMessage(JSON.stringify({ type: "participantJoin" }));
+      FlutterNotification.participantJoin();
     }
   };
 
@@ -132,7 +158,8 @@ const Canvas: FunctionComponent = () => {
   const joinSession = async (
     sessionName: string,
     jwt: string,
-    userName: string
+    userName: string,
+    isVideoCall?: boolean
   ) => {
     await zoomClient.current.init("en-US", "Global", { patchJsMedia: true });
     zoomClient.current.on("peer-video-state-change", renderVideo);
@@ -140,7 +167,9 @@ const Canvas: FunctionComponent = () => {
     setHostname(userName);
 
     const stream = zoomClient.current.getMediaStream();
-    await stream.startVideo();
+
+    isVideoCall ? await stream.startVideo() : null;
+
     await stream.startAudio();
     const devices = await navigator.mediaDevices.enumerateDevices();
     const cameraList = devices.filter((d) => d.kind === "videoinput");
@@ -149,14 +178,17 @@ const Canvas: FunctionComponent = () => {
 
     // render
     setHostAudioMuted(false);
-    await renderVideo({
-      action: "Start",
-      userId: zoomClient.current.getCurrentUserInfo().userId,
-    });
+    isVideoCall
+      ? await renderVideo({
+          action: "Start",
+          userId: zoomClient.current.getCurrentUserInfo().userId,
+        })
+      : null;
 
     zoomClient.current.on("user-added", userAdded);
     zoomClient.current.on("user-removed", userRemoved);
     zoomClient.current.on("connection-change", connectionChange);
+    setVideoCall(isVideoCall ?? false);
   };
 
   const switchHostCamera = async (id: string) => {
@@ -172,7 +204,7 @@ const Canvas: FunctionComponent = () => {
     zoomClient.current.off("peer-video-state-change", renderVideo);
     await zoomClient.current.leave();
     setCallingState("call-end");
-    window.Handler?.postMessage(JSON.stringify({ type: "participantLeave" }));
+    FlutterNotification.leaveSession();
   };
 
   useEffect(() => {
@@ -186,9 +218,7 @@ const Canvas: FunctionComponent = () => {
       setWarningMessage(false);
     }, 10 * 1000);
     showControlsNow();
-    if (window.Handler?.postMessage) {
-      window.Handler?.postMessage(JSON.stringify({ type: "join" }));
-    }
+    FlutterNotification.ready();
   }, []);
 
   const showControlsNow = () => {
@@ -221,10 +251,12 @@ const Canvas: FunctionComponent = () => {
         ) : null}
         {callingState === "calling" ? (
           <div>
-            <Calling />
-            {/* <audio autoPlay loop>
-              <source src={"/ringtone.mp3"} type="audio/mpeg" />
-            </audio> */}
+            <Calling type={type} />
+            {type == "caller" ? (
+              <audio autoPlay loop>
+                <source src={"/ringtone.mp3"} type="audio/mpeg" />
+              </audio>
+            ) : null}
           </div>
         ) : null}
         {callingState === "in-call" && userVideoMuted ? (
@@ -249,11 +281,13 @@ const Canvas: FunctionComponent = () => {
         className="button-container"
         style={{ bottom: showControls ? "20px" : "-100px" }}
       >
-        <VideoButton
-          client={zoomClient}
-          isVideoMuted={hostVideoMuted}
-          renderVideo={renderVideo}
-        />
+        {videoCall ? (
+          <VideoButton
+            client={zoomClient}
+            isVideoMuted={hostVideoMuted}
+            renderVideo={renderVideo}
+          />
+        ) : null}
         <AudioButton
           client={zoomClient}
           isAudioMuted={hostAudioMuted}
