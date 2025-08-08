@@ -60,7 +60,6 @@ class FlutterNotification {
 const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
   type,
 }) => {
-  console.log("Canvas type:", type);
   const mainVideoRef = useRef<HTMLVideoElement>(null);
   const secondaryVideoRef = useRef<HTMLVideoElement>(null);
   const zoomClient = useRef<ReturnType<typeof ZoomVideo.createClient>>(

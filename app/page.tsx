@@ -2,8 +2,9 @@
 import { useSearchParams } from "next/navigation";
 import Script from "next/script";
 import { CanvasWrapper } from "../src/call/CanvasWrapper";
+import { Suspense } from "react";
 
-export default function Page() {
+function PageContent() {
   const searchParams = useSearchParams();
   const typeParam = searchParams.get("type");
   const query =
@@ -14,5 +15,13 @@ export default function Page() {
       <CanvasWrapper type={query} />
       <Script src="/coi-serviceworker.js" strategy="beforeInteractive" />
     </>
+  );
+}
+
+export default function Page() {
+  return (
+    <Suspense>
+      <PageContent />
+    </Suspense>
   );
 }
