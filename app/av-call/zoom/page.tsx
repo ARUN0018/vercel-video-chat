@@ -1,7 +1,7 @@
 "use client";
 import { useSearchParams } from "next/navigation";
 import Script from "next/script";
-import { CanvasWrapper } from "../src/call/CanvasWrapper";
+import { CanvasWrapper } from "../../../src/call/CanvasWrapper";
 import { Suspense } from "react";
 
 function PageContent() {
@@ -20,7 +20,7 @@ function PageContent() {
 
 export default function Page() {
   return (
-    <Suspense fallback={null}>
+    <Suspense>
       <PageContent />
     </Suspense>
   );
