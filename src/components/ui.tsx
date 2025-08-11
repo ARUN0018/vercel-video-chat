@@ -8,12 +8,19 @@ export const Avatar = (props: { name: string }) => {
   );
 };
 
-export const Calling = (props: { type: "caller" | "receiver" }) => {
-  const { type } = props;
+export const Calling = (props: {
+  type: "caller" | "receiver";
+  callingStatus: "calling" | "payment-required";
+}) => {
+  const { type, callingStatus: callingState } = props;
   return (
     <div className="center-content">
       <p className="calling">
-        {type == "caller" ? "Calling" : "Connecting"}
+        {callingState === "payment-required"
+          ? "Recharge to continue"
+          : type == "caller"
+          ? "Calling"
+          : "Connecting"}
         <span className="letter">.</span>
         <span className="letter">.</span>
         <span className="letter">.</span>

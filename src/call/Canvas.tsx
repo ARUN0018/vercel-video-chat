@@ -66,7 +66,7 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
     ZoomVideo.createClient()
   );
   const [callingState, setCallingState] = useState<
-    "calling" | "in-call" | "call-end"
+    "calling" | "in-call" | "call-end" | "payment-required"
   >("calling");
   const [hostVideoMuted, setHostVideoMuted] = useState(true);
   const [hostAudioMuted, setHostAudioMuted] = useState(true);
@@ -119,7 +119,7 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
           }
           mainVideoRef.current.appendChild(userVideo as VideoPlayer);
           setUserVideoMuted(false);
-          setCallingState("in-call");
+          changeCallingState("in-call");
         }
       }
     } else if (event.action === "Stop") {
@@ -154,6 +154,12 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
     }
   };
 
+  const changeCallingState = (
+    state: "calling" | "in-call" | "call-end" | "payment-required"
+  ) => {
+    setCallingState(state);
+  };
+
   const joinSession = async (
     sessionName: string,
     jwt: string,
@@ -164,7 +170,6 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
     zoomClient.current.on("peer-video-state-change", renderVideo);
     await zoomClient.current.join(sessionName, jwt, userName, undefined, 2);
     setHostname(userName);
-
     const stream = zoomClient.current.getMediaStream();
 
     isVideoCall ? await stream.startVideo() : null;
@@ -202,7 +207,7 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
     if (!zoomClient.current) return;
     zoomClient.current.off("peer-video-state-change", renderVideo);
     await zoomClient.current.leave();
-    setCallingState("call-end");
+    changeCallingState("call-end");
     FlutterNotification.leaveSession();
   };
 
@@ -211,6 +216,7 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
       window.videoController = {
         joinSession,
         leaveSession,
+        changeCallingState,
       };
     }
     setTimeout(() => {
@@ -248,10 +254,10 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
             </p>
           </div>
         ) : null}
-        {callingState === "calling" ? (
+        {callingState === "calling" || callingState === "payment-required" ? (
           <div>
-            <Calling type={type} />
-            {type == "caller" ? (
+            <Calling type={type} callingStatus={callingState} />
+            {type == "caller" && callingState != "payment-required" ? (
               <audio autoPlay loop>
                 <source src={"/ringtone.mp3"} type="audio/mpeg" />
               </audio>
