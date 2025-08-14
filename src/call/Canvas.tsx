@@ -9,14 +9,14 @@ import ZoomVideo, {
   VideoQuality,
 } from "@zoom/videosdk";
 import { FunctionComponent, useEffect, useRef, useState } from "react";
-import "./canvas.css"; // Assuming you have some styles for the video player
+import { Avatar, CallEnd, Calling } from "../components/ui";
 import {
   AudioButton,
   CallButton,
   SwitchCamera,
   VideoButton,
 } from "../controls/buttons";
-import { Avatar, CallEnd, Calling } from "../components/ui";
+import "./canvas.css"; // Assuming you have some styles for the video player
 
 // Allow usage of <video-player-container> as a custom element in JSX
 declare global {
@@ -65,6 +65,7 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
   const zoomClient = useRef<ReturnType<typeof ZoomVideo.createClient>>(
     ZoomVideo.createClient()
   );
+  const showControlsTimeout = useRef<ReturnType<typeof setTimeout>>(null);
   const [callingState, setCallingState] = useState<
     "calling" | "in-call" | "call-end" | "payment-required"
   >("calling");
@@ -76,7 +77,7 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
   const [warningMessage, setWarningMessage] = useState(true);
   const [showControls, setShowControls] = useState(true);
   const [videoCall, setVideoCall] = useState(false);
-  const showControlsTimeout = useRef<ReturnType<typeof setTimeout>>(null);
+  const [showButtons, setShowButtons] = useState(true);
 
   const [userVideoMuted, setUserVideoMuted] = useState(true);
   const [userAudioMuted, setUserAudioMuted] = useState(true);
@@ -282,24 +283,26 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
           />
         ) : null}
       </div>
-      <div
-        className="button-container"
-        style={{ bottom: showControls ? "20px" : "-100px" }}
-      >
-        {videoCall ? (
-          <VideoButton
+      {showButtons ? (
+        <div
+          className="button-container"
+          style={{ bottom: showControls ? "20px" : "-100px" }}
+        >
+          {videoCall ? (
+            <VideoButton
+              client={zoomClient}
+              isVideoMuted={hostVideoMuted}
+              renderVideo={renderVideo}
+            />
+          ) : null}
+          <AudioButton
             client={zoomClient}
-            isVideoMuted={hostVideoMuted}
-            renderVideo={renderVideo}
+            isAudioMuted={hostAudioMuted}
+            setIsAudioMuted={setHostAudioMuted}
           />
-        ) : null}
-        <AudioButton
-          client={zoomClient}
-          isAudioMuted={hostAudioMuted}
-          setIsAudioMuted={setHostAudioMuted}
-        />
-        <CallButton action={leaveSession} />
-      </div>
+          <CallButton action={leaveSession} />
+        </div>
+      ) : null}
     </div>
   );
 };
