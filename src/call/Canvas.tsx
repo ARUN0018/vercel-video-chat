@@ -204,6 +204,10 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
     }
   };
 
+  const changeShowButtonsView = (showButton: boolean) => {
+    setShowButtons(showButton);
+  };
+
   const leaveSession = async () => {
     if (!zoomClient.current) return;
     zoomClient.current.off("peer-video-state-change", renderVideo);
@@ -218,6 +222,7 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
         joinSession,
         leaveSession,
         changeCallingState,
+        changeShowButtonsView,
       };
     }
     setTimeout(() => {
