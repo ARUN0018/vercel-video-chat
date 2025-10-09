@@ -120,7 +120,6 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
           }
           mainVideoRef.current.appendChild(userVideo as VideoPlayer);
           setUserVideoMuted(false);
-          changeCallingState("in-call");
         }
       }
     } else if (event.action === "Stop") {
@@ -139,9 +138,23 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
   };
 
   const userAdded = (p: ParticipantPropertiesPayload[]) => {
-    if (p[0].userId != zoomClient.current?.getCurrentUserInfo().userId) {
+    console.log("user added", p);
+    const hostId = zoomClient.current?.getCurrentUserInfo().userId;
+    console.log("host user", hostId);
+    if (p[0].userId != hostId) {
       setUsername(p[0].displayName ?? "");
+      changeCallingState("in-call");
       FlutterNotification.participantJoin();
+    } else if (zoomClient.current?.getAllUser().length > 1) {
+      const participants = zoomClient.current?.getAllUser();
+      console.log("participants", participants);
+      for (const participant of participants) {
+        if (participant.userId != hostId) {
+          console.log("participant user", participant.userId);
+          setUsername(participant.displayName ?? "");
+        }
+      }
+      changeCallingState("in-call");
     }
   };
 
@@ -223,6 +236,7 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
         leaveSession,
         changeCallingState,
         changeShowButtonsView,
+        zoomClient,
       };
     }
     setTimeout(() => {
@@ -280,7 +294,7 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
         {hostVideoMuted ? <Avatar name={hostname} /> : null}
         {/* @ts-expect-error html component */}
         <video-player-container ref={secondaryVideoRef} />
-        {hostCameraList.length > 1 && !hostVideoMuted ? (
+        {hostCameraList.length > 1 && !hostVideoMuted && showButtons ? (
           <SwitchCamera
             cameraList={hostCameraList}
             selectedCamera={hostSelectedCamera}
