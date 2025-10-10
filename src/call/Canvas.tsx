@@ -45,6 +45,7 @@ class FlutterNotification {
   }
 
   static ready() {
+    console.log("ready");
     this._postMessage(JSON.stringify({ type: "ready" }));
   }
 
@@ -238,12 +239,12 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
         changeShowButtonsView,
         zoomClient,
       };
+      FlutterNotification.ready();
     }
     setTimeout(() => {
       setWarningMessage(false);
     }, 10 * 1000);
     showControlsNow();
-    FlutterNotification.ready();
   }, []);
 
   const showControlsNow = () => {

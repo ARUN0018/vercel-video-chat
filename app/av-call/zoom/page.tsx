@@ -13,7 +13,7 @@ function PageContent() {
   return (
     <>
       <CanvasWrapper type={query} />
-      <Script src="/coi-serviceworker.js" strategy="beforeInteractive" />
+      {/* <Script src="/coi-serviceworker.js" strategy="beforeInteractive" /> */}
     </>
   );
 }
