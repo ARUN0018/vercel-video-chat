@@ -195,7 +195,7 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
   const print = (e: any) => {
     let logStr = "";
     Object.keys(e[0]).forEach(
-      (key, value) => logStr + " key: " + key + ", value: " + value
+      (key, value) => (logStr = logStr + " key: " + key + ", value: " + value)
     );
     return logStr;
   };
