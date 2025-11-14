@@ -204,9 +204,10 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
       patchJsMedia: true,
     });
     zoomClient.current.on("peer-video-state-change", renderVideo);
+    zoomClient.current.on("connection-change", connectionChange);
     zoomClient.current.on("user-added", userAdded);
     zoomClient.current.on("user-updated", (e) => {
-      console.log("user updated", e, Date.now());
+      console.log("sdk_testing user updated", e, Date.now());
     });
     await zoomClient.current.join(sessionName, jwt, userName, undefined, 1);
     setHostname(userName);
@@ -229,9 +230,8 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
         })
       : null;
     setVideoCall(isVideoCall ?? false);
-
+    console.log("sdk_testing before user-removed call");
     zoomClient.current.on("user-removed", userRemoved);
-    zoomClient.current.on("connection-change", connectionChange);
   };
 
   const switchHostCamera = async (id: string) => {
