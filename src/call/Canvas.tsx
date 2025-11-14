@@ -212,7 +212,14 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
     zoomClient.current.on("connection-change", connectionChange);
     zoomClient.current.on("user-added", userAdded);
     zoomClient.current.on("user-updated", (e) => {
-      console.log("sdk_testing user updated", e[0], Date.now());
+      console.log(
+        "sdk_testing user updated",
+        e[0]?.audio,
+        e[0]?.bVideoOn,
+        e[0]?.muted,
+        e[0]?.isVideoConnect,
+        Date.now()
+      );
     });
     await zoomClient.current.join(sessionName, jwt, userName, undefined, 1);
     setHostname(userName);
