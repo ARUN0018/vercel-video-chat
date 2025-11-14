@@ -197,6 +197,7 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
     Object.keys(e[0]).forEach(
       (key, value) => logStr + " key: " + key + ", value: " + value
     );
+    return logStr;
   };
   const changeCallingState = (
     state: "calling" | "in-call" | "call-end" | "payment-required"
