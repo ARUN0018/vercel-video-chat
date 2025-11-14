@@ -45,7 +45,7 @@ class FlutterNotification {
   }
 
   static ready() {
-    console.log("ready");
+    console.log("FlutterNotification ready called", Date.now());
     this._postMessage(JSON.stringify({ type: "ready" }));
   }
 
@@ -112,8 +112,11 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
           secondaryVideoRef.current.appendChild(userVideo as VideoPlayer);
           secondaryVideoRef.current.querySelector("video")?.play();
           setHostVideoMuted(false);
-          console.log(`Host video status ${hostVideoMuted}`);
-          console.log(`Host video started for user ${event.userId}`);
+          console.log(`Host video status ${hostVideoMuted}`, Date.now());
+          console.log(
+            `Host video started for user ${event.userId}`,
+            Date.now()
+          );
         } else {
           const childNode = mainVideoRef.current.childNodes;
           for (const child of childNode) {
@@ -139,31 +142,46 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
   };
 
   const userAdded = (p: ParticipantPropertiesPayload[]) => {
-    console.log("user added", p);
-    const hostId = zoomClient.current?.getCurrentUserInfo().userId;
-    console.log("host user", hostId);
-    if (p[0].userId != hostId) {
+    console.log(
+      "user length",
+      zoomClient.current?.getAllUser().length,
+      Date.now()
+    );
+    console.log("user added", p, Date.now());
+    const hostId = zoomClient.current?.getCurrentUserInfo()?.userId;
+    console.log("host user", hostId, Date.now());
+
+    if (hostId && p[0].userId != hostId) {
       setUsername(p[0].displayName ?? "");
       changeCallingState("in-call");
       FlutterNotification.participantJoin();
     } else if (zoomClient.current?.getAllUser().length > 1) {
       const participants = zoomClient.current?.getAllUser();
-      console.log("participants", participants);
+      console.log("participants", participants, Date.now());
       for (const participant of participants) {
         if (participant.userId != hostId) {
-          console.log("participant user", participant.userId);
+          console.log("participant user", participant.userId, Date.now());
           setUsername(participant.displayName ?? "");
+          FlutterNotification.participantJoin();
+          changeCallingState("in-call");
         }
       }
-      changeCallingState("in-call");
     }
   };
 
   const userRemoved = (p: ParticipantPropertiesPayload[]) => {
+    console.log("user removed", p, Date.now());
+    console.log(
+      "user length",
+      zoomClient.current?.getAllUser().length,
+      Date.now()
+    );
+    if (p.length === 0) return;
     leaveSession();
   };
 
   const connectionChange = (payload: ConnectionChangePayload) => {
+    console.log("connection change", payload, Date.now());
     if (payload.state === "Closed" || payload.state === "Fail") {
       leaveSession();
     }
@@ -181,8 +199,14 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
     userName: string,
     isVideoCall?: boolean
   ) => {
-    await zoomClient.current.init("en-US", "Global", { patchJsMedia: true });
+    await zoomClient.current.init("en-US", "Global", {
+      patchJsMedia: true,
+    });
     zoomClient.current.on("peer-video-state-change", renderVideo);
+    zoomClient.current.on("user-added", userAdded);
+    zoomClient.current.on("user-updated", (e) => {
+      console.log("user updated", e, Date.now());
+    });
     await zoomClient.current.join(sessionName, jwt, userName, undefined, 2);
     setHostname(userName);
     const stream = zoomClient.current.getMediaStream();
@@ -203,11 +227,10 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
           userId: zoomClient.current.getCurrentUserInfo().userId,
         })
       : null;
+    setVideoCall(isVideoCall ?? false);
 
-    zoomClient.current.on("user-added", userAdded);
     zoomClient.current.on("user-removed", userRemoved);
     zoomClient.current.on("connection-change", connectionChange);
-    setVideoCall(isVideoCall ?? false);
   };
 
   const switchHostCamera = async (id: string) => {
@@ -277,8 +300,14 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
         ) : null}
         {callingState === "calling" || callingState === "payment-required" ? (
           <div>
-            <Calling type={type} callingStatus={callingState} />
-            {type == "caller" && callingState != "payment-required" ? (
+            <Calling
+              type={type}
+              callingStatus={callingState}
+              participantLength={zoomClient.current?.getAllUser().length}
+            />
+            {type == "caller" &&
+            callingState != "payment-required" &&
+            zoomClient.current?.getAllUser().length === 1 ? (
               <audio autoPlay loop>
                 <source src={"/ringtone.mp3"} type="audio/mpeg" />
               </audio>

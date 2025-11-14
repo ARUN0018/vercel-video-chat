@@ -11,14 +11,15 @@ export const Avatar = (props: { name: string }) => {
 export const Calling = (props: {
   type: "caller" | "receiver";
   callingStatus: "calling" | "payment-required";
+  participantLength?: number;
 }) => {
-  const { type, callingStatus: callingState } = props;
+  const { type, callingStatus: callingState, participantLength } = props;
   return (
     <div className="center-content">
       <p className="calling">
         {callingState === "payment-required"
           ? "Recharge to continue"
-          : type == "caller"
+          : type == "caller" && participantLength === 1
           ? "Calling"
           : "Connecting"}
         <span className="letter">.</span>
