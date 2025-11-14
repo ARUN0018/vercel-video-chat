@@ -171,7 +171,7 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
   };
 
   const userRemoved = (p: ParticipantPropertiesPayload[]) => {
-    console.log("sdk_testing user removed", p, Date.now());
+    console.log("sdk_testing user removed", p[0], Date.now());
     console.log(
       "user length",
       zoomClient.current?.getAllUser().length,
@@ -182,7 +182,12 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
   };
 
   const connectionChange = (payload: ConnectionChangePayload) => {
-    console.log("sdk_testing connection change", payload, Date.now());
+    console.log(
+      "sdk_testing connection change",
+      payload.state,
+      payload.reason,
+      Date.now()
+    );
     if (payload.state === "Closed" || payload.state === "Fail") {
       leaveSession();
     }
@@ -207,7 +212,7 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
     zoomClient.current.on("connection-change", connectionChange);
     zoomClient.current.on("user-added", userAdded);
     zoomClient.current.on("user-updated", (e) => {
-      console.log("sdk_testing user updated", e, Date.now());
+      console.log("sdk_testing user updated", e[0], Date.now());
     });
     await zoomClient.current.join(sessionName, jwt, userName, undefined, 1);
     setHostname(userName);
