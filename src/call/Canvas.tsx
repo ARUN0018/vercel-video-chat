@@ -88,6 +88,7 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
     action: "Start" | "Stop";
     userId: number;
   }) => {
+    console.log("sdk_testing peer connection change", event.action, Date.now());
     const stream = zoomClient.current.getMediaStream();
     if (event.action === "Start") {
       const userVideo = await stream.attachVideo(
@@ -170,7 +171,7 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
   };
 
   const userRemoved = (p: ParticipantPropertiesPayload[]) => {
-    console.log("user removed", p, Date.now());
+    console.log("sdk_testing user removed", p, Date.now());
     console.log(
       "user length",
       zoomClient.current?.getAllUser().length,
@@ -181,7 +182,7 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
   };
 
   const connectionChange = (payload: ConnectionChangePayload) => {
-    console.log("connection change", payload, Date.now());
+    console.log("sdk_testing connection change", payload, Date.now());
     if (payload.state === "Closed" || payload.state === "Fail") {
       leaveSession();
     }
