@@ -207,7 +207,7 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
     zoomClient.current.on("user-updated", (e) => {
       console.log("user updated", e, Date.now());
     });
-    await zoomClient.current.join(sessionName, jwt, userName, undefined, 2);
+    await zoomClient.current.join(sessionName, jwt, userName, undefined, 0.5);
     setHostname(userName);
     const stream = zoomClient.current.getMediaStream();
 
