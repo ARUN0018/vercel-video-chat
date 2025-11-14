@@ -148,7 +148,7 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
       zoomClient.current?.getAllUser().length,
       Date.now()
     );
-    console.log("user added", p, Date.now());
+    console.log("user added", print(p), p, Date.now());
     const hostId = zoomClient.current?.getCurrentUserInfo()?.userId;
     console.log("host user", hostId, Date.now());
 
@@ -171,7 +171,7 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
   };
 
   const userRemoved = (p: ParticipantPropertiesPayload[]) => {
-    console.log("sdk_testing user removed", p[0], Date.now());
+    console.log("sdk_testing user removed", print(p), p[0], Date.now());
     console.log(
       "user length",
       zoomClient.current?.getAllUser().length,
@@ -192,7 +192,12 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
       leaveSession();
     }
   };
-
+  const print = (e: any) => {
+    let logStr = "";
+    Object.keys(e[0]).forEach(
+      (key, value) => logStr + " key: " + key + ", value: " + value
+    );
+  };
   const changeCallingState = (
     state: "calling" | "in-call" | "call-end" | "payment-required"
   ) => {
@@ -212,14 +217,7 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
     zoomClient.current.on("connection-change", connectionChange);
     zoomClient.current.on("user-added", userAdded);
     zoomClient.current.on("user-updated", (e) => {
-      console.log(
-        "sdk_testing user updated",
-        e[0]?.audio,
-        e[0]?.bVideoOn,
-        e[0]?.muted,
-        e[0]?.isVideoConnect,
-        Date.now()
-      );
+      console.log("sdk_testing user updated", print(e), e, Date.now());
     });
     await zoomClient.current.join(sessionName, jwt, userName, undefined, 1);
     setHostname(userName);
