@@ -147,7 +147,7 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
       zoomClient.current?.getAllUser().length,
       Date.now()
     );
-    console.log("user added", print(p), p, Date.now());
+    console.log("user added", JSON.stringify(p), Date.now());
     const hostId = zoomClient.current?.getCurrentUserInfo()?.userId;
     console.log("host user", hostId, Date.now());
 
@@ -170,7 +170,7 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
   };
 
   const userRemoved = (p: ParticipantPropertiesPayload[]) => {
-    console.log("sdk_testing user removed", print(p), p[0], Date.now());
+    console.log("sdk_testing user removed", JSON.stringify(p[0]), Date.now());
     console.log(
       "user length",
       zoomClient.current?.getAllUser().length,
@@ -191,17 +191,22 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
       leaveSession();
     }
   };
-  const print = (e: any) => {
-    let logStr = "";
-    Object.keys(e[0]).forEach(
-      (key, value) => (logStr = logStr + " key: " + key + ", value: " + value)
-    );
-    return logStr;
-  };
+
   const changeCallingState = (
     state: "calling" | "in-call" | "call-end" | "payment-required"
   ) => {
     setCallingState(state);
+  };
+
+  const userUpdate = (p: ParticipantPropertiesPayload[]) => {
+    console.log("user updated", JSON.stringify(p[0]), Date.now());
+    if (p[0].isManager || Object.entries(p[0]).length === 1) {
+      const participant = zoomClient.current?.getUser(p[0].userId);
+      if (participant?.isInFailover) {
+        console.log("user is inFailover", JSON.stringify(p[0]), Date.now());
+        leaveSession();
+      }
+    }
   };
 
   const joinSession = async (
@@ -216,18 +221,7 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
     zoomClient.current.on("peer-video-state-change", renderVideo);
     zoomClient.current.on("connection-change", connectionChange);
     zoomClient.current.on("user-added", userAdded);
-    zoomClient.current.on(
-      "user-updated",
-      (p: ParticipantPropertiesPayload[]) => {
-        console.log("user updated", print(p), p, Date.now());
-        if (p[0].isManager || Object.entries(p[0]).length === 1) {
-          const participant = zoomClient.current?.getUser(p[0].userId);
-          if (participant?.isInFailover) {
-            console.log("call leave session", p);
-          }
-        }
-      }
-    );
+    zoomClient.current.on("user-updated", userUpdate);
 
     await zoomClient.current.join(sessionName, jwt, userName, undefined, 1);
     setHostname(userName);
