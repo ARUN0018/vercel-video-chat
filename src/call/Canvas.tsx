@@ -88,7 +88,6 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
     action: "Start" | "Stop";
     userId: number;
   }) => {
-    console.log("sdk_testing peer connection change", event.action, Date.now());
     const stream = zoomClient.current.getMediaStream();
     if (event.action === "Start") {
       const userVideo = await stream.attachVideo(
@@ -217,16 +216,18 @@ const Canvas: FunctionComponent<{ type: "caller" | "receiver" }> = ({
     zoomClient.current.on("peer-video-state-change", renderVideo);
     zoomClient.current.on("connection-change", connectionChange);
     zoomClient.current.on("user-added", userAdded);
-    zoomClient.current.on("user-updated", (e) => {
-      e[0].sharerOn;
-      console.log("sdk_testing user updated", print(e), e, Date.now());
-    });
-    zoomClient.current.on("active-media-failed", (e) => {
-      console.log("active-media-failed", print(e), e, Date.now());
-    });
-    zoomClient.current.on("active-share-change", (e) => {
-      console.log("active-share-change", print(e), e, Date.now());
-    });
+    zoomClient.current.on(
+      "user-updated",
+      (p: ParticipantPropertiesPayload[]) => {
+        console.log("user updated", print(p), p, Date.now());
+        if (p[0].isManager || Object.entries(p[0]).length === 1) {
+          const participant = zoomClient.current?.getUser(p[0].userId);
+          if (participant?.isInFailover) {
+            console.log("call leave session", p);
+          }
+        }
+      }
+    );
 
     await zoomClient.current.join(sessionName, jwt, userName, undefined, 1);
     setHostname(userName);
